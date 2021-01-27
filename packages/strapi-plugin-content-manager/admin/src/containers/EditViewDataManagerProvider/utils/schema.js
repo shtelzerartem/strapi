@@ -8,6 +8,7 @@ import {
   isEmpty,
   isNaN,
   toNumber,
+  clone,
 } from 'lodash';
 import moment from 'moment';
 import * as yup from 'yup';
@@ -209,14 +210,16 @@ const createYupSchema = (
   );
 };
 
-const createYupSchemaAttribute = (type, validations, options) => {
-  let schema = yup.mixed();
+const createYupSchemaAttribute = (type, validationsFrozen, options) => {
+  const validations = clone(validationsFrozen);
 
+  let schema = yup.mixed();
   let regex = get(validations, 'regex', null);
-  delete validations.regex;
 
   if (regex) {
     validations.regex = new RegExp(regex);
+  } else {
+    delete validations.regex;
   }
 
   if (['string', 'uid', 'text', 'richtext', 'email', 'password', 'enumeration'].includes(type)) {
